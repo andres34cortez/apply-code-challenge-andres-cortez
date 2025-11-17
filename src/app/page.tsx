@@ -30,16 +30,12 @@ export default function CatalogPage() {
     }
   }, [genre, lastGenre]);
 
-  // hago la precarga de los juegos
   useEffect(() => {
     if (games.length > 0 && !isLoading) {
       if (currentPageState === 1) {
-        // si encuentro juegos muestro la page 1
         setAllGames(games);
       } else {
-        // si no es la primera pagina, acumulo los juegos
         setAllGames((prev) => {
-          // evito duplicados comprobando los IDs
           const existingIds = new Set(prev.map((g) => g.id));
           const newGames = games.filter((g) => !existingIds.has(g.id));
           return [...prev, ...newGames];

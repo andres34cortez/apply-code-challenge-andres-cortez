@@ -37,7 +37,6 @@ describe('CartContext', () => {
 
   describe('useCart', () => {
     it('should throw error when used outside CartProvider', () => {
-      // Suppress console.error for this test
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
 
       expect(() => {

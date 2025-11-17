@@ -25,7 +25,6 @@ export function GenreFilter({ availableFilters }: GenreFilterProps) {
       params.set("genre", genre);
     }
 
-    // Reset to page 1 when changing genre
     params.delete("page");
 
     router.push(`/?${params.toString()}`);

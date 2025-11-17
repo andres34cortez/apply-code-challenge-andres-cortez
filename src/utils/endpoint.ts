@@ -8,7 +8,6 @@ export interface Game {
   isNew: boolean;
 }
 
-// Mock games data
 export const allGames: Game[] = [
   {
     id: "1",

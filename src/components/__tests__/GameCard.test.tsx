@@ -20,7 +20,6 @@ describe("GameCard", () => {
   );
 
   beforeEach(() => {
-    // Clear localStorage before each test
     localStorage.clear();
   });
   it("should render game information", () => {
@@ -84,26 +83,22 @@ describe("GameCard", () => {
     const user = userEvent.setup();
     render(<GameCard game={mockGame} />, { wrapper });
 
-    // Add to cart first
     const addButton = screen.getByRole("button", {
       name: /add test game to cart/i,
     });
     await user.click(addButton);
 
-    // Wait for remove button to appear
     await waitFor(() => {
       expect(
         screen.getByRole("button", { name: /remove test game from cart/i })
       ).toBeInTheDocument();
     });
 
-    // Then remove
     const removeButton = screen.getByRole("button", {
       name: /remove test game from cart/i,
     });
     await user.click(removeButton);
 
-    // Wait for add button to appear again
     await waitFor(() => {
       expect(
         screen.getByRole("button", { name: /add test game to cart/i })

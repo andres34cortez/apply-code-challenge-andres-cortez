@@ -90,6 +90,10 @@ describe("useGames", () => {
     const error = new Error("Failed to fetch");
     (gamesService.getGames as jest.Mock).mockRejectedValueOnce(error);
 
+    const consoleSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
     const { result } = renderHook(() => useGames());
 
     await waitFor(() => {
@@ -98,6 +102,8 @@ describe("useGames", () => {
 
     expect(result.current.error).toEqual(error);
     expect(result.current.games).toEqual([]);
+
+    consoleSpy.mockRestore();
   });
 
   it("should refetch games when refetch is called", async () => {

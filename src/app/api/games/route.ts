@@ -17,14 +17,11 @@ export async function GET(request: Request) {
 
   if (page < 1 || Number.isNaN(page)) page = 1;
 
-  // Mock a delay to simulate a real API
   await delay(2000);
 
-  // Calculate total pages based on filtered games (before pagination)
   const totalPages = Math.ceil(games.length / ITEMS_PER_PAGE);
   const currentPage = page;
 
-  // Apply pagination
   const fromIndex = (page - 1) * ITEMS_PER_PAGE;
   const toIndex = page * ITEMS_PER_PAGE;
   games = games.slice(fromIndex, toIndex);

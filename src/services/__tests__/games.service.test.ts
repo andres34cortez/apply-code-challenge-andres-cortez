@@ -1,13 +1,11 @@
 import { gamesService } from '../games.service'
 import type { GamesResponse } from '@/types'
 
-// Mock fetch
 global.fetch = jest.fn()
 
 describe('GamesService', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    // Reset env
     process.env.NEXT_PUBLIC_API_URL = 'http://localhost:3000'
   })
 

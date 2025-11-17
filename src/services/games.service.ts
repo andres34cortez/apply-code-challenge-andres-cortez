@@ -1,12 +1,6 @@
 import { env } from "@/config/env";
 import type { GamesResponse, UseGamesParams } from "@/types";
 
-/**
- * Games Service
- * Handles all API calls related to games
- * Follows separation of concerns principle
- */
-
 class GamesService {
   private readonly baseUrl: string;
 
@@ -14,12 +8,6 @@ class GamesService {
     this.baseUrl = env.apiUrl;
   }
 
-  /**
-   * Fetches games from the API with optional filters
-   * @param params - Query parameters for filtering and pagination
-   * @returns Promise with games response
-   * @throws Error if the request fails
-   */
   async getGames(params: UseGamesParams = {}): Promise<GamesResponse> {
     const { genre, page = 1 } = params;
 
@@ -29,7 +17,6 @@ class GamesService {
     }
     searchParams.append("page", page.toString());
 
-    // Use relative URL if baseUrl is empty (production without env var)
     const basePath = this.baseUrl || "";
     const url = `${basePath}/api/games?${searchParams.toString()}`;
 
@@ -39,7 +26,7 @@ class GamesService {
         headers: {
           "Content-Type": "application/json",
         },
-        cache: "no-store", // Always fetch fresh data for client-side calls
+        cache: "no-store",
       });
 
       if (!response.ok) {
@@ -51,7 +38,6 @@ class GamesService {
       const data: GamesResponse = await response.json();
       return data;
     } catch (error) {
-      // Enhanced error handling
       if (error instanceof Error) {
         throw new Error(`GamesService.getGames: ${error.message}`);
       }
