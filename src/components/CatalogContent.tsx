@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
 import { GameCard } from "@/components/GameCard";
 import { GenreFilter } from "@/components/GenreFilter";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import Link from "next/link";
 import type { Game, GamesResponse } from "@/types";
 
@@ -13,34 +14,44 @@ interface CatalogContentProps {
 }
 
 export function CatalogContent({ initialData, genre }: CatalogContentProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const currentPage = Number.parseInt(searchParams.get("page") || "1", 10);
-
   const [allGames, setAllGames] = useState<Game[]>(initialData.games);
-  const [currentPageState, setCurrentPageState] = useState(currentPage);
+  const [currentPageState, setCurrentPageState] = useState(
+    initialData.currentPage
+  );
   const [lastGenre, setLastGenre] = useState<string | undefined>(genre);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(
+    currentPageState < initialData.totalPages
+  );
 
   useEffect(() => {
     if (lastGenre !== genre) {
       setAllGames(initialData.games);
-      setCurrentPageState(1);
+      setCurrentPageState(initialData.currentPage);
       setLastGenre(genre);
-    } else if (currentPageState === 1) {
-      setAllGames(initialData.games);
+      setHasMore(initialData.currentPage < initialData.totalPages);
     }
-  }, [genre, lastGenre, initialData.games, currentPageState]);
+  }, [
+    genre,
+    lastGenre,
+    initialData.games,
+    initialData.currentPage,
+    initialData.totalPages,
+  ]);
 
-  const handleSeeMore = async () => {
+  const loadMoreGames = useCallback(async () => {
+    if (isLoadingMore || !hasMore) return;
+
     const nextPage = currentPageState + 1;
     setIsLoadingMore(true);
 
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("page", nextPage.toString());
-    router.push(`/?${params.toString()}`, { scroll: false });
-
     try {
+      const params = new URLSearchParams();
+      if (genre) {
+        params.set("genre", genre);
+      }
+      params.set("page", nextPage.toString());
+
       const response = await fetch(`/api/games?${params.toString()}`);
       const data: GamesResponse = await response.json();
 
@@ -49,13 +60,20 @@ export function CatalogContent({ initialData, genre }: CatalogContentProps) {
         const newGames = data.games.filter((g) => !existingIds.has(g.id));
         return [...prev, ...newGames];
       });
+
       setCurrentPageState(nextPage);
+      setHasMore(nextPage < data.totalPages);
     } catch (error) {
       console.error("Error loading more games:", error);
     } finally {
       setIsLoadingMore(false);
     }
-  };
+  }, [isLoadingMore, hasMore, currentPageState, genre]);
+
+  const targetRef = useInfiniteScroll({
+    onLoadMore: loadMoreGames,
+    enabled: hasMore && !isLoadingMore,
+  });
 
   return (
     <main className='min-h-screen bg-gray-50'>
@@ -77,21 +95,29 @@ export function CatalogContent({ initialData, genre }: CatalogContentProps) {
               ))}
             </div>
 
-            {currentPageState < initialData.totalPages && (
-              <div className='flex justify-center'>
-                <button
-                  onClick={handleSeeMore}
-                  disabled={isLoadingMore}
-                  className='px-8 py-3 bg-gray-900 text-white rounded hover:bg-gray-800 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed'
+            {hasMore && (
+              <>
+                <div
+                  ref={targetRef}
+                  className='flex flex-col items-center justify-center py-8'
                 >
-                  {isLoadingMore ? "Loading..." : "See More"}
-                </button>
-              </div>
+                  {isLoadingMore && <LoadingSpinner />}
+                </div>
+
+                <div className='flex justify-center py-4'>
+                  <button
+                    onClick={loadMoreGames}
+                    disabled={isLoadingMore}
+                    className='px-8 py-3 bg-gray-900 text-white rounded hover:bg-gray-800 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed'
+                  >
+                    See more
+                  </button>
+                </div>
+              </>
             )}
           </>
         )}
 
-        {/* Empty State */}
         {allGames.length === 0 && (
           <div className='text-center py-12'>
             <p className='text-gray-600 text-lg'>No games found.</p>
