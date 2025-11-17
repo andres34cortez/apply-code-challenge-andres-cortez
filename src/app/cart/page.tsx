@@ -154,8 +154,9 @@ export default function CartPage() {
           </div>
 
           
-          <div className='lg:col-span-1'>
-            <div className='bg-white rounded-lg top-4'>
+          <div className='lg:col-span-1  rounded-lg h-fit self-start'>
+            <div className=' border-[0.5px] p-4 mb-5 border-[#8F8F8F] rounded-lg top-4'>
+
               <h2 className='text-xl font-bold text-[#3B3B3B] mb-2  '>
                 Order Summary
               </h2>
@@ -185,14 +186,14 @@ export default function CartPage() {
                   </span>
                 </div>
               </div>
-
+</div>
               <button
-                className='w-full py-2 px-4 bg-[#585660] text-white  rounded-lg hover:bg-gray-800 transition-colors font-semibold'
+                className='w-full py-2 px-4 bg-[#585660] text-white  text-[16px] rounded-lg hover:bg-gray-800 transition-colors font-semibold'
                 aria-label='Proceed to checkout'
               >
                 Checkout
               </button>
-            </div>
+            
           </div>
         </div>
       </div>
