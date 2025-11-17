@@ -119,7 +119,7 @@ describe('GamesService', () => {
 
       // Re-import to get new instance with updated env
       jest.resetModules()
-      const { gamesService: newService } = require('../games.service')
+      const { gamesService: newService } = await import('../games.service')
 
       ;(fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useGames } from "@/hooks/useGames";
 import { GameCard } from "@/components/GameCard";
@@ -9,7 +9,7 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import Link from "next/link";
 import type { Game } from "@/types";
 
-export default function CatalogPage() {
+function CatalogContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const genre = searchParams.get("genre") || undefined;
@@ -121,5 +121,13 @@ export default function CatalogPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function CatalogPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <CatalogContent />
+    </Suspense>
   );
 }
